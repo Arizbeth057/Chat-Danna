@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Práctica de evaluación Socket</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"></script>
+</head>
+<body>
+
+    <div id="panel-bienvenida">
+        <h2>Práctica de evaluación usando Sockets de comunicación - Danna Arizbeth Miranda Morales</h2>
+        <input id="persona" type="text" placeholder="Ingresa tu nombre">
+        <button id="ingresar" onclick="ingresarAlChat()">Ingresar al chat</button>
+    </div>
+
+    <div id="app-chat" style="display:none;">
+        <h2>Práctica de evaluación 1er. parcial - Danna Arizbeth Miranda Morales</h2>
+        <h2 class="nube box">Chat con socket</h2>
+        <div id="ventana-mensajes">
+            <div id="output"></div>
+            <div id="escribiendo-mensaje"></div>
+        </div>
+        <input id="usuario" type="text" placeholder="Tu nombre">
+        <input id="mensaje" type="text" placeholder="Ingresa un mensaje">
+        
+        <!-- Campo para adjuntar archivos -->
+        <input id="archivoInput" type="file" style="margin: 10px 0;">
+        
+        <!-- Botón para grabar notas de voz -->
+        <div style="margin: 10px 0;">
+            <button id="botonGrabar" type="button" class="btn-grabar">🎙️ Grabar Audio</button>
+            <span id="estadoGrabacion" style="margin-left: 8px; font-size: 0.9em; color: #7C4DFF;"></span>
+        </div>
+
+        <button id="enviar">Enviar</button>
+    </div>
+
+    <!-- Sonido de notificación -->
+    <audio id="sonidoNotificacion" src="/assets/campana.mp3" preload="auto"></audio>
+
+    <script src="/chat.js"></script>
+
+</body>
+</html>
