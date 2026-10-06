@@ -1,0 +1,19 @@
+{
+  "name": "chatnodearizbeth",
+  "version": "1.0.0",
+  "description": "Chat en nodejs",
+  "license": "ISC",
+  "author": "Danna Arizbeth Miranda Morales",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "nodemon": "^3.1.14",
+    "socket.io": "^4.8.4"
+  }
+}
