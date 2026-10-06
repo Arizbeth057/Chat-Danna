@@ -11,7 +11,75 @@ var persona = document.getElementById('persona'),
     escribiendoMensaje = document.getElementById('escribiendo-mensaje'),
     output = document.getElementById('output'),
     archivoInput = document.getElementById('archivoInput'),
-    sonidoNotificacion = document.getElementById('sonidoNotificacion');
+    sonidoNotificacion = document.getElementById('sonidoNotificacion'),
+    botonGrabar = document.getElementById('botonGrabar'),
+    estadoGrabacion = document.getElementById('estadoGrabacion');
+
+// Variables para la grabación de audio
+var mediaRecorder;
+var audioChunks = [];
+var grabando = false;
+
+// Configurar grabación de nota de voz
+if (botonGrabar) {
+    botonGrabar.addEventListener('click', function() {
+        if (!grabando) {
+            // Iniciar grabación
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = function(e) {
+                        audioChunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = function() {
+                        var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        enviarAudioServidor(audioBlob);
+                        
+                        // Detener uso del micrófono
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    grabando = true;
+                    botonGrabar.textContent = '⏹️ Detener y Enviar Audio';
+                    botonGrabar.classList.add('grabando');
+                    estadoGrabacion.textContent = 'Grabando...';
+                })
+                .catch(function(err) {
+                    alert('No se pudo acceder al micrófono: ' + err.message);
+                });
+        } else {
+            // Detener grabación
+            mediaRecorder.stop();
+            grabando = false;
+            botonGrabar.textContent = '🎙️ Grabar Audio';
+            botonGrabar.classList.remove('grabando');
+            estadoGrabacion.textContent = '';
+        }
+    });
+}
+
+// Función para enviar el blob de audio grabado
+function enviarAudioServidor(blob) {
+    var formData = new FormData();
+    var nombreArchivo = 'nota_voz_' + Date.now() + '.webm';
+    formData.append('archivo', blob, nombreArchivo);
+    formData.append('usuario', usuario.value);
+
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(res) {
+        return res.json();
+    })
+    .catch(function(err) {
+        console.error('Error al subir el audio:', err);
+    });
+}
 
 // Función para reproducir sonido de notificación estilo WhatsApp
 function reproducirSonido() {
@@ -78,16 +146,20 @@ socket.on('chat', function(data) {
     reproducirSonido();
 });
 
-// Escuchar evento de recepción de archivos
+// Escuchar evento de recepción de archivos (Imágenes, Audios, Documentos)
 socket.on('file-message', function(data) {
     escribiendoMensaje.innerHTML = '';
     var contenido = '';
 
-    // Si es imagen muestra la previsualización, si no, muestra enlace de descarga
     if (data.fileType.startsWith('image/')) {
+        // Previsualización de imagen
         contenido = '<br><img src="' + data.filePath + '" style="max-width: 220px; border-radius: 8px; margin-top: 5px;">';
+    } else if (data.fileType.startsWith('audio/')) {
+        // Reproductor de audio incrustado para notas de voz
+        contenido = '<br><audio controls src="' + data.filePath + '" style="margin-top: 5px; max-width: 100%;"></audio>';
     } else {
-        contenido = '<br><a href="' + data.filePath + '" target="_blank" style="color: #337ab7; font-weight: bold;">📄 Descargar ' + data.fileName + '</a>';
+        // Enlace de descarga para otros archivos
+        contenido = '<br><a href="' + data.filePath + '" target="_blank" style="color: #7C4DFF; font-weight: bold;">📄 Descargar ' + data.fileName + '</a>';
     }
 
     output.innerHTML += '<p><strong>' + data.usuario + ':</strong> ' + contenido + '</p>';

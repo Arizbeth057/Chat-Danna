@@ -136,3 +136,24 @@ button:hover {
     box-shadow: -2px 2px 2px 0 rgba(178, 178, 178, 0.4);
     left: -9px;
 }
+.btn-grabar {
+    background-color: #eea5de;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+}
+
+.btn-grabar.grabando {
+    background-color: #e68cd2;
+    animation: pulso 1s infinite;
+}
+
+@keyframes pulso {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
